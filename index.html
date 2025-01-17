@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculateur d'Émissions Carbone Numériques</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Calculateur d'Émissions Carbone Numériques</h1>
+        
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="calculator">Calculateur</button>
+            <button class="tab-btn" data-tab="analysis">Analyse Détaillée</button>
+            <button class="tab-btn" data-tab="resources">Ressources</button>
+        </div>
+
+        <div class="tab-content active" id="calculator">
+            <div class="calculator">
+                <div class="input-section">
+                    <h2>Données de Base</h2>
+                    <div class="input-group">
+                        <label for="pageSize">Taille de la page (Ko):</label>
+                        <input type="number" id="pageSize" min="0" value="0">
+                        <span class="info-tooltip" data-tooltip="La taille totale de votre page, incluant tous les assets">ℹ️</span>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="monthlyVisits">Visites mensuelles:</label>
+                        <input type="number" id="monthlyVisits" min="0" value="0">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="bounceRate">Taux de rebond (%):</label>
+                        <input type="number" id="bounceRate" min="0" max="100" value="50">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="avgSessionDuration">Durée moyenne de session (minutes):</label>
+                        <input type="number" id="avgSessionDuration" min="0" value="3">
+                    </div>
+                </div>
+
+                <div class="input-section">
+                    <h2>Infrastructure</h2>
+                    <div class="input-group">
+                        <label for="serverLocation">Localisation du serveur:</label>
+                        <select id="serverLocation">
+                            <option value="0.519">Europe (519g CO2/kWh)</option>
+                            <option value="0.709">Amérique du Nord (709g CO2/kWh)</option>
+                            <option value="0.623">Asie (623g CO2/kWh)</option>
+                            <option value="0.283">France (283g CO2/kWh)</option>
+                            <option value="0.200">Pays Nordiques (200g CO2/kWh)</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="cdnUsage">Utilisation d'un CDN:</label>
+                        <select id="cdnUsage">
+                            <option value="0">Non</option>
+                            <option value="1">Oui</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="caching">Stratégie de cache:</label>
+                        <select id="caching">
+                            <option value="0">Aucune</option>
+                            <option value="0.3">Basique</option>
+                            <option value="0.6">Intermédiaire</option>
+                            <option value="0.8">Avancée</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button onclick="calculateEmissions()" class="calculate-btn">Calculer l'Impact</button>
+
+                <div id="results" class="results hidden">
+                    <h2>Résultats de l'Analyse</h2>
+                    
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <h3>Émissions CO2</h3>
+                            <div class="result-item">
+                                <span>Par visite:</span>
+                                <span id="perVisitEmissions">0 g CO2</span>
+                            </div>
+                            <div class="result-item">
+                                <span>Mensuelles:</span>
+                                <span id="monthlyEmissions">0 g CO2</span>
+                            </div>
+                            <div class="result-item">
+                                <span>Annuelles:</span>
+                                <span id="yearlyEmissions">0 kg CO2</span>
+                            </div>
+                        </div>
+
+                        <div class="metric-card">
+                            <h3>Équivalences</h3>
+                            <div class="result-item">
+                                <span>Km en voiture:</span>
+                                <span id="carEquivalent">0 km</span>
+                            </div>
+                            <div class="result-item">
+                                <span>Arbres nécessaires:</span>
+                                <span id="treeEquivalent">0 arbres</span>
+                            </div>
+                        </div>
+
+                        <div class="metric-card">
+                            <h3>Performance</h3>
+                            <div class="result-item">
+                                <span>Score écologique:</span>
+                                <div class="progress-bar">
+                                    <div id="ecoScore" class="progress" style="width: 0%">0%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recommendations hidden" id="recommendations">
+                    <h2>Recommandations d'Optimisation</h2>
+                    <div class="recommendations-grid">
+                        <div id="criticalRecommendations" class="recommendation-category">
+                            <h3>Priorité Haute</h3>
+                            <ul></ul>
+                        </div>
+                        <div id="importantRecommendations" class="recommendation-category">
+                            <h3>Priorité Moyenne</h3>
+                            <ul></ul>
+                        </div>
+                        <div id="optionalRecommendations" class="recommendation-category">
+                            <h3>Optimisations Additionnelles</h3>
+                            <ul></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="analysis">
+            <div class="analysis-content">
+                <h2>Analyse Détaillée de l'Impact</h2>
+                <div id="detailedAnalysis">
+                    <div class="chart-container">
+                        <canvas id="emissionsChart"></canvas>
+                    </div>
+                    <div class="analysis-metrics">
+                        <div id="performanceMetrics"></div>
+                        <div id="trendAnalysis"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="resources">
+            <div class="resources-content">
+                <h2>Ressources et Bonnes Pratiques</h2>
+                <div class="resources-grid">
+                    <div class="resource-card">
+                        <h3>Guides d'Optimisation</h3>
+                        <ul>
+                            <li>
+                                <a href="https://www.ecoindex.fr/guides/" target="_blank">
+                                    Guide EcoIndex
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://www.thegreenwebfoundation.org/" target="_blank">
+                                    The Green Web Foundation
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://www.websitecarbon.com/" target="_blank">
+                                    Website Carbon Calculator
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="resource-card">
+                        <h3>Outils Recommandés</h3>
+                        <ul>
+                            <li>
+                                <a href="https://developers.google.com/web/tools/lighthouse" target="_blank">
+                                    Google Lighthouse
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://www.webpagetest.org/" target="_blank">
+                                    WebPageTest
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://gtmetrix.com/" target="_blank">
+                                    GTmetrix
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="resource-card">
+                        <h3>Articles et Études</h3>
+                        <ul>
+                            <li>
+                                <a href="https://theshiftproject.org/article/impact-environnemental-du-numerique-5g-nouvelle-etude-du-shift/" target="_blank">
+                                    Impact du numérique - The Shift Project
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://www.greenit.fr/" target="_blank">
+                                    GreenIT.fr
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
